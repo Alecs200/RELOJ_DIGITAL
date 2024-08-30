@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="canvas" width="400" height="600" style="background-color:#f0f0f0">
+
+</canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let radius = canvas.height / 4; // Ajustar el radio para centrar el reloj
+ctx.translate(canvas.width / 2, canvas.height / 2);
+radius = radius * 0.90;
+setInterval(drawClock, 1000);
+
+function drawClock() {
+  drawStraps(ctx, radius); // Llamada para dibujar las correas del reloj
+  drawFace(ctx, radius);
+  drawRomanNumerals(ctx, radius); // Cambiado para números romanos
+  drawTicks(ctx, radius);
+  drawTopText(ctx, radius); // Mover "CASIO" a la parte superior
+  drawDateBox(ctx, radius);
+  drawTime(ctx, radius);
+}
+
+function drawStraps(ctx, radius) {
+  // Correa superior
+  ctx.fillStyle = "#d4af37";  // Implementamos color dorado
+  ctx.fillRect(-radius * 0.3, -radius * 2.2, radius * 0.6, radius * 1.2); // Superior
+
+  // Correa inferior
+  ctx.fillRect(-radius * 0.3, radius * 1, radius * 0.6, radius * 1.2); // Inferior
+
+  // Detalle central de la correa superior
+  ctx.fillStyle = "#C0C0C0";  // implemantamos color plateado
+  ctx.fillRect(-radius * 0.15, -radius * 2.2, radius * 0.3, radius * 1.2);
+
+  // Detalle central de la correa inferior
+  ctx.fillRect(-radius * 0.15, radius * 1, radius * 0.3, radius * 1.2);
+}
+
+function drawFace(ctx, radius) {
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+  const grad = ctx.createRadialGradient(0, 0, radius * 0.95, 0, 0, radius * 1.05);
+  grad.addColorStop(0, '#ccc');
+  grad.addColorStop(0.5, '#f0f0f0');
+  grad.addColorStop(1, '#ccc');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = radius * 0.1;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
+  ctx.fillStyle = '#333';
+  ctx.fill();
+}
+
+function drawRomanNumerals(ctx, radius) {
+		//implementamos numero romanos
+  const romanNumerals = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+  ctx.font = radius * 0.12 + "px Arial";  // reducimos tamaño fuente
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  for (let num = 0; num < 12; num++) {
+    let ang = num * Math.PI / 6;
+    ctx.rotate(ang);
+    ctx.translate(0, -radius * 0.75); // Aumentamos la distancia desde el centro
+    ctx.rotate(-ang);
+    ctx.fillText(romanNumerals[num], 0, 0);
+    ctx.rotate(ang);
+    ctx.translate(0, radius * 0.75);
+    ctx.rotate(-ang);
+  }
+}
+
+function drawTicks(ctx, radius) {
+  for (let i = 0; i < 60; i++) {
+    if (i % 5 !== 0) {
+      let ang = i * Math.PI / 30;
+      ctx.rotate(ang);
+      ctx.translate(0, -radius * 0.9);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, radius * 0.05);
+      ctx.lineWidth = radius * 0.01;
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+      ctx.translate(0, radius * 0.9);
+      ctx.rotate(-ang);
+    }
+  }
+}
+
+function drawTopText(ctx, radius) {
+  ctx.font = radius * 0.15 + "px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#333";
+  //ajustamos en que parte del reloj ponemos el casio
+  ctx.fillText("CASIO", 0, -radius * 0.3);
+
+function drawDateBox(ctx, radius) {
+  const now = new Date();
+  const day = now.getDate().toString().padStart(2, '0');
+  ctx.fillStyle = "white";
+  ctx.fillRect(radius * 0.35, -radius * 0.1, radius * 0.3, radius * 0.2);
+
+  ctx.strokeStyle = "#ccc";
+  ctx.strokeRect(radius * 0.35, -radius * 0.1, radius * 0.3, radius * 0.2);
+
+  ctx.font = radius * 0.15 + "px Arial";
+  ctx.fillStyle = "#333";
+  ctx.textAlign = "center";
+  ctx.fillText(day, radius * 0.5, 0);
+}
+
+function drawTime(ctx, radius) {
+  const now = new Date();
+  let hour = now.getHours();
+  let minute = now.getMinutes();
+  let second = now.getSeconds();
+  //hora
+  hour = hour % 12;
+  hour = (hour * Math.PI / 6) +
+    (minute * Math.PI / (6 * 60)) +
+    (second * Math.PI / (360 * 60));
+  drawHand(ctx, hour, radius * 0.5, radius * 0.07);
+  //minutos
+  minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
+  drawHand(ctx, minute, radius * 0.8, radius * 0.07);
+  // segundos
+  second = (second * Math.PI / 30);
+  drawHand(ctx, second, radius * 0.9, radius * 0.02, "#d4af37");
+}
+
+function drawHand(ctx, pos, length, width, color = "#333") {
+  ctx.beginPath();
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = color;
+  ctx.moveTo(0, 0);
+  ctx.rotate(pos);
+  ctx.lineTo(0, -length);
+  ctx.stroke();
+  ctx.rotate(-pos);
+}
+</script>
+
+</body>
+</html>
